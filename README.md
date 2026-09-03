@@ -62,6 +62,23 @@ and it deliberately breaks the recursion in three places:
 
 So: feedback with a damper, not a function calling itself.
 
+## vs. continuous memory systems (Engram, mem0, …)
+
+Tools like Weaviate's Engram attack the same problem — agents learning from
+experience, with scope controlling where the learning travels — with the
+opposite bets. They capture on *every task* (async adds → auto-transform →
+vector store) and decide relevance at **read time** via semantic search over
+an unbounded store. retro captures at *milestones* through a human-gated
+interview and decides relevance at **write time** via the size cap — a
+lesson either displaces a weaker one or doesn't get in. Their bet: storage
+is cheap and retrieval is good. This bet: an agent reads 25 curated,
+evidence-backed lines more faithfully than it searches thousands of
+auto-generated memories — and a person can still audit every one. The
+continuous-capture role in this stack belongs to `learned-behavior`, which
+is the closer analog to those systems; retro is the curation layer they
+automate away. No vector database, no service: two markdown files and
+SQLite.
+
 ## The three rules
 
 1. **Ritual** — runs at milestones (release tag, merge to main, project
