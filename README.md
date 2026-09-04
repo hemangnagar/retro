@@ -95,7 +95,8 @@ SQLite.
 ```
 milestone → /retro
   inputs   : learned-behavior review · git log since last retro tag · session transcripts
-  interview: five fixed questions, every time
+  interview: four fixed questions, drafted from evidence; you reply agree | edit | skip
+  scope    : one lesson at a time, closed menu — project | stack | global | discard
   distill  : claim + evidence + scope + confidence per lesson
   write    : project → learned-behavior (its promote/decay manages them)
              stack/global → ~/.retro/playbook.md (size-capped, linked from ~/.claude/CLAUDE.md)

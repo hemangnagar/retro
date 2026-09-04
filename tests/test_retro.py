@@ -125,3 +125,36 @@ def test_transcript_encoding_matches_claude_code_flattening(tmp_path):
     from retro.inputs import transcript_files
     found = transcript_files(str(repo), projects_dir=str(projects))
     assert len(found) == 1 and found[0]["path"].endswith("abc.jsonl")
+
+
+# ---- deterministic interview + scope menu -----------------------------------
+
+def test_scope_menu_is_closed_and_parses_aliases():
+    from retro.questions import SCOPE_OPTIONS, parse_scope_answer
+    assert [k for k, _ in SCOPE_OPTIONS] == ["project", "stack", "global", "discard"]
+    assert parse_scope_answer("Global") == "global"
+    assert parse_scope_answer("stack:python") == "stack:python"
+    assert parse_scope_answer("stack git") == "stack:git"
+    assert parse_scope_answer("drop") == "discard"
+    assert parse_scope_answer("meh, maybe global-ish") is None
+
+
+def test_classify_cli_returns_menu_and_prompt(tmp_path):
+    out = subprocess.run(
+        ["python", "-m", "retro.cli", "classify", "--repo", str(tmp_path),
+         "--claim", "verify assumptions before building", "--index", "2",
+         "--evidence", "abc123"],
+        capture_output=True, text=True, check=True)
+    data = json.loads(out.stdout)
+    assert data["options"] == ["project", "stack", "global", "discard"]
+    assert "Lesson 2:" in data["prompt"] and "abc123" in data["prompt"]
+    assert "suggested" in data["prompt"]
+
+
+def test_questions_cli_is_the_fixed_script():
+    out = subprocess.run(["python", "-m", "retro.cli", "questions"],
+                         capture_output=True, text=True, check=True)
+    data = json.loads(out.stdout)
+    assert [q["key"] for q in data["interview"]] == [
+        "goal", "slower_than_expected", "wrong_first", "lb_candidates"]
+    assert "agree | edit" in data["reply_protocol"]

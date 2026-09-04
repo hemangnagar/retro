@@ -41,44 +41,64 @@ transcripts for this repo. Skim the newest transcript(s) with targeted reads
 If the repo has had no meaningful work since the last retro tag, say so and
 stop; a retro over nothing manufactures lessons.
 
-## Step 2 — The interview (fixed questions, every time)
+## Step 2 — The interview (fixed questions, drafted answers, one-token replies)
 
-Ask the user these five questions, in order, one at a time. If running
-autonomously, draft answers from the evidence, label them clearly as drafts,
-and get confirmation before Step 4's cross-project writes.
+The four questions are constants — print them with
+`python -m retro.cli questions` and use those exact words:
 
 1. What was the goal, and did it change?
 2. What took longer than expected, and why?
 3. What did we get wrong first, and what was the fix?
 4. Which of learned-behavior's candidate lessons have a real cause vs. are
-   noise? (Skip if learned-behavior had nothing.)
-5. For each lesson emerging from 1–4: is this about **this repo**, **this
-   stack**, or **the developer's way of working**?
+   noise? (If learned-behavior had nothing: what recurring friction did you
+   notice?)
 
-The questions are fixed on purpose — the value is in the ritual being
-comparable across projects, not in clever adaptive questioning.
+Draft an answer to each from the evidence first, then show all four
+questions with their drafts in one message and ask for the fixed reply
+protocol: **for each number, `agree` | `edit: <text>` | `skip`**. Drafts
+carry the load so the user reacts instead of composes; the closed reply set
+keeps the answers comparable across retros and cheap to give. A skipped
+question is recorded as declined and produces no lesson.
 
-## Step 3 — Distill and scope the lessons
+If running autonomously, mark every answer `agent-draft` and do not proceed
+past Step 3 until a person has replied.
 
-Turn the interview into lessons. Each lesson needs:
+## Step 3 — Distill, then scope each lesson from a closed menu
+
+Turn the confirmed answers into lessons. Each lesson needs:
 
 - **claim** — one sentence, imperative, testable by the next project.
 - **evidence** — at least one commit sha, session/transcript ref, or
   learned-behavior fingerprint. A lesson with no evidence is an opinion; drop
   it or mark confidence ≤ 0.4.
-- **scope** — get a suggestion per claim from
-  `python -m retro.cli classify --claim "..." --repo "$PWD"`, then decide
-  yourself; the classifier assists, the interview decides. Scoping tests:
-  - Would this sentence be true and useful in a repo that shares nothing
-    with this one but the language/tooling? → `stack`.
-  - True and useful even in a different stack? → `global`.
-  - Needs this repo's nouns to make sense? → `project`.
 - **confidence** — 0–1; how surprised you'd be if it didn't hold next time.
 
-Bias check before moving on: if everything came out `project`, the
-classification was probably timid — re-ask question 5 for the two strongest
-lessons. If more than ~2 lessons came out `global` from a single retro, it
-was probably grandiose — global lessons should be rare.
+Then scope **one lesson at a time**, and never with an open question. Run
+`python -m retro.cli classify --claim "..." --repo "$PWD" --index N
+--evidence <refs>` — it returns the classifier's suggestion AND the menu.
+Put the choice to the user as exactly these four options, suggestion marked:
+
+| option | meaning |
+|---|---|
+| `project` | About this repo. → learned-behavior, this workspace only. |
+| `stack` | About this language/tooling. → playbook as `stack:<name>` (ask which). |
+| `global` | About how the developer works, any stack. → playbook, budgeted. |
+| `discard` | Not worth keeping. → retro.json as considered-and-dropped, nowhere else. |
+
+When the `AskUserQuestion` tool is available, use it: one question per
+lesson (header "Scope", the four options in this order, the suggested one
+labelled "(suggested)"), batching up to four lessons per call. Without it,
+print the `prompt` text the CLI returned verbatim and normalize the reply
+with `python -m retro.cli scope "<reply>"` — a reply outside the menu is
+re-asked, not interpreted.
+
+The classifier assists; the person decides. Scoping tests to offer if they
+hesitate: true and useful in a repo sharing only the tooling → `stack`; true
+in a different stack → `global`; needs this repo's nouns → `project`.
+
+Bias check after all lessons are scoped: everything `project` → probably
+timid, offer the two strongest for re-scoping. More than ~2 `global` from
+one retro → probably grandiose, say so before writing.
 
 ## Step 4 — Write the outputs
 
@@ -128,10 +148,13 @@ retro.json shape (keep exactly these keys so retros stay comparable):
   "interview": {"goal": "...", "slower_than_expected": "...",
                  "wrong_first": "...", "lb_candidates": "...",
                  "answered_by": "user | agent-draft"},
-  "lessons": [{"claim": "...", "evidence": ["sha|ref"], "scope": "project|stack:<name>|global",
-                "confidence": 0.0, "written_to": "learned-behavior|playbook|rejected", "hits": 0}]
+  "lessons": [{"claim": "...", "evidence": ["sha|ref"], "scope": "project|stack:<name>|global|discard",
+                "confidence": 0.0, "written_to": "learned-behavior|playbook:R<n>|rejected|discarded", "hits": 0}]
 }
 ```
+
+Discarded lessons stay in `retro.json` on purpose: the next retro can see
+what was considered and dropped, so the same non-lesson isn't re-litigated.
 
 ## Degraded modes (normal, not failures)
 

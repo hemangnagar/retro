@@ -19,6 +19,7 @@ from pathlib import Path
 from . import classify as classify_mod
 from . import inputs as inputs_mod
 from . import playbook as playbook_mod
+from . import questions as questions_mod
 
 
 def _print(obj) -> None:
@@ -30,9 +31,29 @@ def cmd_inputs(args) -> int:
     return 0
 
 
-def cmd_classify(args) -> int:
-    _print(classify_mod.suggest_scope(args.claim, args.repo))
+def cmd_questions(args) -> int:
+    _print({
+        "interview": [{"key": k, "question": q} for k, q in questions_mod.INTERVIEW],
+        "reply_protocol": questions_mod.REPLY_PROTOCOL,
+        "scope_options": [{"option": k, "meaning": d} for k, d in questions_mod.SCOPE_OPTIONS],
+    })
     return 0
+
+
+def cmd_classify(args) -> int:
+    suggestion = classify_mod.suggest_scope(args.claim, args.repo)
+    suggestion["options"] = [k for k, _ in questions_mod.SCOPE_OPTIONS]
+    suggestion["prompt"] = questions_mod.scope_prompt(
+        args.index, args.claim, args.evidence or [], suggestion["scope"])
+    _print(suggestion)
+    return 0
+
+
+def cmd_scope(args) -> int:
+    parsed = questions_mod.parse_scope_answer(args.answer)
+    _print({"answer": args.answer, "scope": parsed, "valid": parsed is not None,
+            "options": [k for k, _ in questions_mod.SCOPE_OPTIONS]})
+    return 0 if parsed else 1
 
 
 def cmd_playbook(args) -> int:
@@ -85,10 +106,19 @@ def main(argv: list[str] | None = None) -> int:
                    help="extra transcript directories to include")
     p.set_defaults(func=cmd_inputs)
 
-    p = sub.add_parser("classify", help="suggest a scope for a lesson claim")
+    p = sub.add_parser("questions", help="print the fixed interview script + scope menu")
+    p.set_defaults(func=cmd_questions)
+
+    p = sub.add_parser("classify", help="suggest a scope for a lesson claim (+ the menu prompt)")
     p.add_argument("--claim", required=True)
     p.add_argument("--repo", default=".")
+    p.add_argument("--index", type=int, default=1, help="lesson number shown in the prompt")
+    p.add_argument("--evidence", nargs="*", help="evidence refs shown in the prompt")
     p.set_defaults(func=cmd_classify)
+
+    p = sub.add_parser("scope", help="normalize a user's scope reply to a menu option")
+    p.add_argument("answer")
+    p.set_defaults(func=cmd_scope)
 
     p = sub.add_parser("playbook", help="manage the cross-project playbook")
     p.add_argument("action", choices=["init", "add", "list", "hit", "status"])
