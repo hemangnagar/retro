@@ -108,3 +108,20 @@ def test_retro_json_commit_is_the_boundary_when_tags_missing(tmp_path):
     assert got["last_retro_boundary_sha"]
     assert got["commit_count"] == 1
     assert got["commits"][0]["subject"] == "after"
+
+
+def test_transcript_encoding_matches_claude_code_flattening(tmp_path):
+    # Claude Code turns /x/grocery_optimizer into -x-grocery-optimizer:
+    # every non-alphanumeric becomes '-', underscores included.
+    repo = tmp_path / "grocery_optimizer"
+    repo.mkdir()
+    projects = tmp_path / "projects"
+    import re as _re
+    encoded = _re.sub(r"[^A-Za-z0-9-]", "-", str(repo.resolve()))
+    session_dir = projects / encoded
+    session_dir.mkdir(parents=True)
+    (session_dir / "abc.jsonl").write_text("{}")
+
+    from retro.inputs import transcript_files
+    found = transcript_files(str(repo), projects_dir=str(projects))
+    assert len(found) == 1 and found[0]["path"].endswith("abc.jsonl")

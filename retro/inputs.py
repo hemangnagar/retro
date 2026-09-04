@@ -131,7 +131,10 @@ def transcript_files(repo: str, projects_dir: str | None = None,
     via extra_dirs.
     """
     base = Path(projects_dir or Path.home() / ".claude" / "projects")
-    encoded = str(Path(repo).resolve()).replace("/", "-").replace("\\", "-").replace(":", "-")
+    # Claude Code flattens EVERY non-alphanumeric in the cwd to '-'
+    # (/home/user/grocery_optimizer -> -home-user-grocery-optimizer),
+    # so mirror that exactly rather than translating separators only.
+    encoded = re.sub(r"[^A-Za-z0-9-]", "-", str(Path(repo).resolve()))
     candidates = [base / encoded] + [Path(d) for d in (extra_dirs or [])]
     rows = []
     for directory in candidates:
