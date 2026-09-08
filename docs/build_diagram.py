@@ -54,7 +54,7 @@ def chip(x, y, w, head, body):
 def svg_body() -> str:
     s = []
     # title
-    s.append(f'<rect x="90" y="36" width="540" height="52" fill="{{HILITE}}"/>')
+    s.append(f'<rect x="90" y="36" width="470" height="52" fill="{{HILITE}}"/>')
     s.append(f'<text x="100" y="76" font-size="36" fill="{{INK}}"><tspan font-weight="800">Milestone Retrospectives</tspan>'
              f'<tspan font-weight="400" dx="16">with a curated playbook</tspan></text>')
     s.append(f'<text x="600" y="118" text-anchor="middle" font-size="16.5" fill="{{MUTED}}">retro turns what a project taught into lessons scoped to where they belong. A person decides what a lesson is about;</text>')
@@ -86,8 +86,8 @@ def svg_body() -> str:
 
     # branches out of Scope
     s.append(arrow([(390, 712), (390, 764)], "stack · global", 402, 744, color="{ACCENT}", anchor="start"))
-    s.append(arrow([(550, 675), (809, 675)], "project", 680, 667))
-    s.append(arrow([(550, 700), (680, 700), (680, 805), (809, 805)], "discard", 700, 760, anchor="start"))
+    s.append(arrow([(550, 675), (809, 675)], "project", 615, 667))
+    s.append(arrow([(550, 700), (680, 700), (680, 805), (809, 805)], "discard", 714, 760, anchor="start"))
 
     s.append(node(230, 770, 320, 96, "Budget gate", "playbook capped at 25 slots", "must displace the weakest — or is rejected",
                   fill="{ACCENT_SOFT}", stroke="{ACCENT}"))
@@ -134,16 +134,54 @@ def render(tokens: dict, mono: str, standalone: bool) -> str:
     for k, v in tokens.items():
         body = body.replace("{" + k + "}", v)
     bg = f'<rect width="{W}" height="{H}" fill="{tokens["PAPER"]}"/>\n' if standalone else ""
-    font = (' font-family="IBM Plex Sans, Segoe UI, system-ui, sans-serif"')
+    font = (' font-family="IBM Plex Sans, Segoe UI, Liberation Sans, system-ui, sans-serif"')
     xmlns = ' xmlns="http://www.w3.org/2000/svg"' if standalone else ""
     return (f'<svg{xmlns} viewBox="0 0 {W} {H}" width="100%" role="img" aria-label="{LABEL}"{font}>\n'
             f'{bg}{body}\n</svg>')
 
 
+def render_png(scale: int = 2) -> Path | None:
+    """Rasterize the standalone SVG with Playwright's Chromium (optional dep).
+    Returns the PNG path, or None with a hint when Playwright isn't installed."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("PNG skipped: `pip install playwright && playwright install chromium` to enable --png")
+        return None
+    out = HERE / "retro-flow.png"
+    # Screenshot the <svg> inside a minimal HTML page: Chromium's full-page
+    # capture of a bare SVG document can hang, element capture is reliable.
+    wrapper = HERE / ".retro-flow.render.html"
+    wrapper.write_text(
+        '<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#f6f5f1}'
+        f'svg{{display:block;width:{W}px;height:{H}px}}</style></head><body>'
+        + (HERE / "retro-flow.svg").read_text(encoding="utf-8") + "</body></html>", encoding="utf-8")
+    import os
+    # A pinned Playwright may not match the browsers on disk; point it at one
+    # with PLAYWRIGHT_CHROMIUM_EXECUTABLE=/path/to/chrome when that happens.
+    launch_kwargs = {}
+    if os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE"):
+        launch_kwargs["executable_path"] = os.environ["PLAYWRIGHT_CHROMIUM_EXECUTABLE"]
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(**launch_kwargs)
+        page = browser.new_page(viewport={"width": W, "height": H}, device_scale_factor=scale)
+        page.goto(wrapper.resolve().as_uri())
+        page.wait_for_timeout(300)
+        page.locator("svg").screenshot(path=str(out))
+        browser.close()
+    wrapper.unlink(missing_ok=True)
+    return out
+
+
 if __name__ == "__main__":
-    mono = "IBM Plex Mono, ui-monospace, Consolas, monospace"
+    import sys
+    mono = "IBM Plex Mono, ui-monospace, Consolas, Liberation Mono, monospace"
     (HERE / "retro-flow.svg").write_text(render(LIGHT, mono, standalone=True), encoding="utf-8")
     inline = render(VARS, mono, standalone=False)
     page = (HERE / "retro-flow.template.html").read_text(encoding="utf-8").replace("{{SVG}}", inline)
     (HERE / "retro-flow.html").write_text(page, encoding="utf-8")
     print("wrote docs/retro-flow.svg and docs/retro-flow.html")
+    if "--png" in sys.argv:
+        png = render_png()
+        if png:
+            print(f"wrote {png.relative_to(HERE.parent)} ({png.stat().st_size // 1024} KB)")
