@@ -12,6 +12,12 @@ layer on top of [`learned-behavior`](https://github.com/lisn0/learned-behavior)
 (behavioral signal, no LLM, workspace-scoped), not a replacement for it and
 not another session-memory tool.
 
+## How it works, in one picture
+
+![How retro works: milestone trigger, three local inputs, human-gated interview, closed scope menu, budgeted playbook, two stores](docs/retro-flow.svg)
+
+*Rebuild with `python docs/build_diagram.py` (emits the SVG, a themed HTML page, and — via Playwright — a PNG for posting).*
+
 ## How this is different from the files you already have
 
 Every surface below answers a different question. retro doesn't replace any

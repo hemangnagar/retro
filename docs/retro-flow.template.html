@@ -1,0 +1,38 @@
+<title>Retro Flow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f6f5f1; --card: #ffffff; --ink: #1b1f24; --muted: #5f6670; --line: #1b1f24;
+    --accent: #5b4bd6; --accent_soft: #e9e6fb; --amber: #b7791f; --amber_soft: #fbf1dc; --hilite: #d9d3ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #12141a; --card: #1b1e27; --ink: #eceef3; --muted: #a2a8b4; --line: #c9cdd6;
+      --accent: #a79cf6; --accent_soft: #24223a; --amber: #e0a63a; --amber_soft: #332913; --hilite: #3a3470;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #12141a; --card: #1b1e27; --ink: #eceef3; --muted: #a2a8b4; --line: #c9cdd6;
+    --accent: #a79cf6; --accent_soft: #24223a; --amber: #e0a63a; --amber_soft: #332913; --hilite: #3a3470;
+  }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+  figure { margin: 0 auto; max-width: 1240px; padding: 24px 20px 40px; }
+  svg { display: block; max-width: 100%; height: auto; }
+  figcaption { max-width: 78ch; margin: 18px auto 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  figcaption a { color: var(--accent); }
+</style>
+<figure>
+{{SVG}}
+<figcaption>How <strong>retro</strong> works. A milestone — not a session — triggers it. Three local inputs
+(learned-behavior's observations, git history since the last retro, session transcripts) feed a
+four-question interview whose answers are drafted from evidence and confirmed by a person. Each
+distilled lesson is scoped from a closed menu: <em>project</em> lessons go to learned-behavior for that
+workspace only; <em>stack</em> and <em>global</em> lessons must pass a size budget to enter the
+25-slot playbook that CLAUDE.md loads at every session start; <em>discards</em> are recorded in
+retro.json so they aren't re-litigated. The retro tag becomes the boundary the next retro starts
+from. Source: <a href="https://github.com/hemangnagar/retro">github.com/hemangnagar/retro</a>.</figcaption>
+</figure>

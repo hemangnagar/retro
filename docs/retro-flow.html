@@ -1,0 +1,129 @@
+<title>Retro Flow</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f6f5f1; --card: #ffffff; --ink: #1b1f24; --muted: #5f6670; --line: #1b1f24;
+    --accent: #5b4bd6; --accent_soft: #e9e6fb; --amber: #b7791f; --amber_soft: #fbf1dc; --hilite: #d9d3ff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #12141a; --card: #1b1e27; --ink: #eceef3; --muted: #a2a8b4; --line: #c9cdd6;
+      --accent: #a79cf6; --accent_soft: #24223a; --amber: #e0a63a; --amber_soft: #332913; --hilite: #3a3470;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #12141a; --card: #1b1e27; --ink: #eceef3; --muted: #a2a8b4; --line: #c9cdd6;
+    --accent: #a79cf6; --accent_soft: #24223a; --amber: #e0a63a; --amber_soft: #332913; --hilite: #3a3470;
+  }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+  figure { margin: 0 auto; max-width: 1240px; padding: 24px 20px 40px; }
+  svg { display: block; max-width: 100%; height: auto; }
+  figcaption { max-width: 78ch; margin: 18px auto 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  figcaption a { color: var(--accent); }
+</style>
+<figure>
+<svg viewBox="0 0 1200 1090" width="100%" role="img" aria-label="How retro works: a milestone triggers a retro; three local inputs feed a four-question interview a person confirms; each lesson is scoped from a closed menu; project lessons go to learned-behavior, stack and global lessons pass a size budget into a playbook loaded every session, discards are recorded in retro.json, and the retro tag becomes the next retro's boundary." font-family="IBM Plex Sans, Segoe UI, system-ui, sans-serif">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--line)"/></marker>
+  <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/></marker>
+</defs>
+<rect x="90" y="36" width="540" height="52" fill="var(--hilite)"/>
+<text x="100" y="76" font-size="36" fill="var(--ink)"><tspan font-weight="800">Milestone Retrospectives</tspan><tspan font-weight="400" dx="16">with a curated playbook</tspan></text>
+<text x="600" y="118" text-anchor="middle" font-size="16.5" fill="var(--muted)">retro turns what a project taught into lessons scoped to where they belong. A person decides what a lesson is about;</text>
+<text x="600" y="141" text-anchor="middle" font-size="16.5" fill="var(--muted)">a size budget decides what stays. Nothing here runs per task — only at milestones.</text>
+<rect x="230" y="190" width="320" height="62" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="390.0" y="213" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Milestone reached</text>
+<text x="390.0" y="232" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">release tag · merge to main · archive</text>
+<polyline points="390,252 390,268" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="150,268 590,268" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="150,268 150,294" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<polyline points="370,268 370,294" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<polyline points="590,268 590,294" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="50" y="300" width="200" height="72" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="150.0" y="318" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">git log</text>
+<text x="150.0" y="337" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">since the last</text>
+<text x="150.0" y="355" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">retro boundary</text>
+<rect x="270" y="300" width="200" height="72" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="370.0" y="318" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">learned-behavior</text>
+<text x="370.0" y="337" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">repeated failures</text>
+<text x="370.0" y="355" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">candidate lessons</text>
+<rect x="490" y="300" width="200" height="72" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="590.0" y="318" text-anchor="middle" font-size="14" font-weight="600" fill="var(--ink)">session transcripts</text>
+<text x="590.0" y="337" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">~/.claude/projects/</text>
+<text x="590.0" y="355" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">&lt;repo&gt;/*.jsonl</text>
+<polyline points="150,372 150,398" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="370,372 370,398" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="590,372 590,398" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="150,398 590,398" fill="none" stroke="var(--line)" stroke-width="1.6"/>
+<polyline points="390,398 390,414" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="230" y="420" width="320" height="84" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="390.0" y="444" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Interview — 4 fixed questions</text>
+<text x="390.0" y="463" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">answers drafted from the evidence</text>
+<text x="390.0" y="481" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">you reply: agree · edit · skip</text>
+<rect x="462" y="408" width="98" height="22" rx="11" fill="var(--amber_soft)" stroke="var(--amber)" stroke-width="1.2"/><text x="511.0" y="423" text-anchor="middle" font-size="11" font-weight="700" letter-spacing=".06em" fill="var(--amber)">HUMAN GATE</text>
+<polyline points="390,504 390,534" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="230" y="540" width="320" height="60" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="390.0" y="562" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Distill</text>
+<text x="390.0" y="581" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">claim · evidence · confidence</text>
+<polyline points="390,600 390,630" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="230" y="636" width="320" height="76" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="390.0" y="656" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Scope — closed menu</text>
+<text x="390.0" y="675" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">one lesson at a time</text>
+<text x="390.0" y="693" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">project | stack | global | discard</text>
+<rect x="462" y="624" width="98" height="22" rx="11" fill="var(--amber_soft)" stroke="var(--amber)" stroke-width="1.2"/><text x="511.0" y="639" text-anchor="middle" font-size="11" font-weight="700" letter-spacing=".06em" fill="var(--amber)">HUMAN GATE</text>
+<polyline points="390,712 390,764" fill="none" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow-accent)"/><text x="402" y="744" text-anchor="start" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--accent)">stack · global</text>
+<polyline points="550,675 809,675" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/><text x="680" y="667" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">project</text>
+<polyline points="550,700 680,700 680,805 809,805" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/><text x="700" y="760" text-anchor="start" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">discard</text>
+<rect x="230" y="770" width="320" height="96" rx="10" fill="var(--accent_soft)" stroke="var(--accent)" stroke-width="1.5"/>
+<text x="390.0" y="800" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Budget gate</text>
+<text x="390.0" y="819" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">playbook capped at 25 slots</text>
+<text x="390.0" y="837" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">must displace the weakest — or is rejected</text>
+<polyline points="550,818 700,818 700,318 809,318" fill="none" stroke="var(--paper)" stroke-width="7"/>
+<polyline points="550,818 700,818 700,318 809,318" fill="none" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+<text x="686" y="560" transform="rotate(-90 686 560)" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--accent)">added · reinforced · rejected</text>
+<polyline points="390,866 390,904" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="230" y="910" width="320" height="62" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="390.0" y="933" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">Finish</text>
+<text x="390.0" y="952" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">retro.json written · tag retro/YYYY-MM-DD</text>
+<polyline points="550,941 740,941 740,845 809,845" fill="none" stroke="var(--line)" stroke-width="1.6" marker-end="url(#arrow)"/>
+<polyline points="230,941 28,941 28,336 44,336" fill="none" stroke="var(--line)" stroke-width="1.6" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+<text x="40" y="640" transform="rotate(-90 40 640)" text-anchor="middle" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">boundary for the next retro</text>
+<rect x="790" y="190" width="370" height="782" rx="14" fill="var(--accent_soft)" stroke="var(--accent)" stroke-width="1.5"/>
+<text x="975" y="228" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">Where lessons live</text>
+<rect x="815" y="255" width="320" height="122" rx="10" fill="var(--card)" stroke="var(--accent)" stroke-width="1.5"/>
+<text x="975.0" y="298" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">~/.retro/playbook.md</text>
+<text x="975.0" y="317" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">stack:&lt;name&gt; + global lessons only</text>
+<text x="975.0" y="335" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">25 slots · evidence + hit counter per line</text>
+<text x="975" y="366" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--accent)">written by /retro, nothing else</text>
+<polyline points="975,377 975,418" fill="none" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrow-accent)"/><text x="986" y="402" text-anchor="start" font-size="11.5" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--accent)">@-import</text>
+<rect x="815" y="425" width="320" height="80" rx="10" fill="var(--card)" stroke="var(--accent)" stroke-width="1.5"/>
+<text x="975.0" y="447" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">~/.claude/CLAUDE.md</text>
+<text x="975.0" y="466" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">loaded at every session start,</text>
+<text x="975.0" y="484" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">in every project</text>
+<rect x="815" y="630" width="320" height="90" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="975.0" y="657" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">learned-behavior (SQLite)</text>
+<text x="975.0" y="676" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">project lessons, this workspace only</text>
+<text x="975.0" y="694" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">auto promote / decay, no LLM</text>
+<rect x="815" y="760" width="320" height="100" rx="10" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+<text x="975.0" y="792" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">retro.json + tag retro/YYYY-MM-DD</text>
+<text x="975.0" y="811" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">per-repo audit trail:</text>
+<text x="975.0" y="829" text-anchor="middle" font-size="12" font-family="IBM Plex Mono, ui-monospace, Consolas, monospace" fill="var(--muted)">kept · rejected · discarded</text>
+<rect x="90" y="1010" width="330" height="54" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="1"/><text x="104" y="1032" font-size="11.5" font-weight="700" letter-spacing=".1em" fill="var(--accent)">RITUAL</text><text x="104" y="1051" font-size="12.5" fill="var(--ink)">runs at milestones, never every session</text>
+<rect x="435" y="1010" width="330" height="54" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="1"/><text x="449" y="1032" font-size="11.5" font-weight="700" letter-spacing=".1em" fill="var(--accent)">SCOPE</text><text x="449" y="1051" font-size="12.5" fill="var(--ink)">only stack + global lessons cross projects</text>
+<rect x="780" y="1010" width="330" height="54" rx="8" fill="var(--card)" stroke="var(--line)" stroke-width="1"/><text x="794" y="1032" font-size="11.5" font-weight="700" letter-spacing=".1em" fill="var(--accent)">BUDGET</text><text x="794" y="1051" font-size="12.5" fill="var(--ink)">a new lesson must displace one — or lose</text>
+</svg>
+<figcaption>How <strong>retro</strong> works. A milestone — not a session — triggers it. Three local inputs
+(learned-behavior's observations, git history since the last retro, session transcripts) feed a
+four-question interview whose answers are drafted from evidence and confirmed by a person. Each
+distilled lesson is scoped from a closed menu: <em>project</em> lessons go to learned-behavior for that
+workspace only; <em>stack</em> and <em>global</em> lessons must pass a size budget to enter the
+25-slot playbook that CLAUDE.md loads at every session start; <em>discards</em> are recorded in
+retro.json so they aren't re-litigated. The retro tag becomes the boundary the next retro starts
+from. Source: <a href="https://github.com/hemangnagar/retro">github.com/hemangnagar/retro</a>.</figcaption>
+</figure>
