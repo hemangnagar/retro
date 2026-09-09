@@ -158,3 +158,28 @@ def test_questions_cli_is_the_fixed_script():
     assert [q["key"] for q in data["interview"]] == [
         "goal", "slower_than_expected", "wrong_first", "lb_candidates"]
     assert "agree | edit" in data["reply_protocol"]
+
+
+# ---- learned-behavior json-first, text-fallback ------------------------------
+
+def test_lb_review_prefers_json_and_falls_back_to_text(monkeypatch):
+    from retro import inputs
+
+    def json_capable(cmd, cwd=None):
+        if "--output" in cmd:
+            return 0, json.dumps({"repeated_failures": [], "lessons": [
+                {"status": "approved", "title": "T", "rule_text": "R" * 200,
+                 "confidence": 0.8, "observations": 3, "updated_at": "x"}]})
+        raise AssertionError("text path should not run when json works")
+    monkeypatch.setattr(inputs, "_run", json_capable)
+    got = inputs.lb_review("/ws")
+    assert got["source"] == "json" and len(got["lessons"][0]["rule_text"]) == 200
+
+    def legacy(cmd, cwd=None):
+        if "--output" in cmd:
+            return 2, "error: unrecognized arguments: --output json"
+        return 0, ("Continuous learning review for /ws\n\nStored lessons:\n"
+                   "- [approved] T: R (confidence 0.80, observations 3)")
+    monkeypatch.setattr(inputs, "_run", legacy)
+    got = inputs.lb_review("/ws")
+    assert got["source"] == "text" and got["lessons"][0]["title"] == "T"

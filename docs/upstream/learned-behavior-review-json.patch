@@ -1,0 +1,172 @@
+From 3fa4a06b5d24fa9831c2772d99af3422c5a307dc Mon Sep 17 00:00:00 2001
+From: Hemang Nagar <hnagar@gmail.com>
+Date: Wed, 9 Sep 2026 17:34:52 +0000
+Subject: [PATCH] review: add --output json for scripts and other tools
+
+The human text output truncates rule_text and summaries and is not a stable
+contract for consumers. `--output json` emits the same query results as a
+structured, untruncated shape: workspace, since, include_candidates,
+repeated_failures[] and lessons[]. The default (text) output is unchanged.
+Mirrors the existing `advice --output` flag.
+---
+ CHANGELOG.md                |  1 +
+ README.md                   |  1 +
+ learning.py                 | 37 ++++++++++++++++++++-
+ tests/test_review_output.py | 65 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+), 1 deletion(-)
+ create mode 100644 tests/test_review_output.py
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index db17e06..31d421b 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -5,6 +5,7 @@ All notable changes to `learned-behavior` are documented here. The format follow
+ ## [Unreleased]
+ 
+ ### Added
++- `review --output json` — a stable, untruncated JSON shape (`workspace`, `since`, `include_candidates`, `repeated_failures[]`, `lessons[]`) so scripts and other tools can consume the review without parsing the human text. Default output is unchanged.
+ - README "Privacy" section with stable `#privacy` anchor — explicit no-network / no-telemetry / no-third-parties guarantees, separate from the existing "Side effects & permissions" technical breakdown.
+ 
+ ## [0.2.0] — 2026-04-25
+diff --git a/README.md b/README.md
+index 69312f5..6cf69f6 100644
+--- a/README.md
++++ b/README.md
+@@ -188,6 +188,7 @@ When installed as a plugin, three on-demand commands are available — nothing f
+ learned-behavior advice --workspace "$PWD"        # lessons relevant to this project
+ learned-behavior learn ...                        # persist a new lesson manually
+ learned-behavior review --workspace "$PWD"        # summary of lessons + recurring errors
++learned-behavior review --workspace "$PWD" --output json   # same, as JSON for scripts
+ 
+ learned-behavior mine --workspace "$PWD"          # cluster error events into candidates
+ learned-behavior mine-edits --workspace "$PWD"    # cluster repeated Edit self-corrections
+diff --git a/learning.py b/learning.py
+index bffd3fe..1b3ecaf 100755
+--- a/learning.py
++++ b/learning.py
+@@ -171,6 +171,12 @@ def parse_args() -> argparse.Namespace:
+     review.add_argument("--workspace", required=True)
+     review.add_argument("--days", type=int, default=14)
+     review.add_argument("--limit", type=int, default=10)
++    review.add_argument(
++        "--output",
++        choices=("text", "json"),
++        default="text",
++        help="Output format. json is a stable, untruncated shape for scripts and other tools.",
++    )
+     review.add_argument("--all", action="store_true",
+                         help="Include candidate lessons (default: approved only)")
+ 
+@@ -1026,8 +1032,37 @@ def command_review(args: argparse.Namespace) -> int:
+         (workspace, args.limit),
+     ).fetchall()
+ 
+-    lines = [f"Continuous learning review for {workspace}"]
+     filtered = [r for r in repeated if not _is_noise(normalize_error_text(r["summary"] or ""))]
++    if getattr(args, "output", "text") == "json":
++        print(json.dumps({
++            "workspace": workspace,
++            "since": since,
++            "include_candidates": bool(args.all),
++            "repeated_failures": [
++                {
++                    "fingerprint": row["fingerprint"],
++                    "tool_name": row["tool_name"],
++                    "summary": row["summary"],
++                    "count": row["count"],
++                    "last_seen": row["last_seen"],
++                }
++                for row in filtered
++            ],
++            "lessons": [
++                {
++                    "status": row["status"],
++                    "title": row["title"],
++                    "rule_text": row["rule_text"],
++                    "confidence": row["confidence"],
++                    "observations": row["observations"],
++                    "updated_at": row["updated_at"],
++                }
++                for row in lessons
++            ],
++        }, indent=2))
++        return 0
++
++    lines = [f"Continuous learning review for {workspace}"]
+     if filtered:
+         lines.append("")
+         lines.append("Repeated failures:")
+diff --git a/tests/test_review_output.py b/tests/test_review_output.py
+new file mode 100644
+index 0000000..302874f
+--- /dev/null
++++ b/tests/test_review_output.py
+@@ -0,0 +1,65 @@
++"""`review --output json` emits a stable, untruncated shape; text output is unchanged."""
++from __future__ import annotations
++
++import argparse
++import json
++from pathlib import Path
++
++import learning
++
++
++def _seed(db: Path, workspace: str) -> None:
++    conn = learning.connect_db(str(db))
++    learning.ensure_db(conn)
++    now = learning.utc_now()
++    long_rule = "Use sh -c instead of bash -lc because the image has no bash " * 4  # > 150 chars
++    conn.execute(
++        "INSERT INTO lessons (created_at, updated_at, workspace, status, agent, "
++        "title, rule_text, rationale, fingerprint, confidence, observations, "
++        "approvals, last_seen_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
++        (now, now, workspace, "approved", "claude", "No bash in image",
++         long_rule, "observed", "fp-bash", 0.8, 3, 1, now),
++    )
++    for _ in range(2):  # HAVING COUNT(*) >= 2
++        conn.execute(
++            "INSERT INTO events (created_at, agent, source, workspace, event_name, "
++            "status, session_id, tool_name, prompt, summary, fingerprint, payload_json) "
++            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
++            (now, "claude", "test", workspace, "PostToolUseFailure", "error",
++             "s1", "Bash", None, "npm ERR! peer dep conflict", "fp-npm", "{}"),
++        )
++    conn.commit()
++    conn.close()
++
++
++def _args(db: Path, workspace: str, output: str) -> argparse.Namespace:
++    return argparse.Namespace(db=str(db), workspace=workspace, days=14, limit=10,
++                              all=True, output=output)
++
++
++def test_review_json_is_structured_and_untruncated(tmp_path: Path, capsys) -> None:
++    db = tmp_path / "learning.db"
++    workspace = str(tmp_path)
++    _seed(db, workspace)
++
++    assert learning.command_review(_args(db, workspace, "json")) == 0
++    data = json.loads(capsys.readouterr().out)
++
++    assert data["workspace"] == learning.repo_root_for(workspace)
++    assert data["include_candidates"] is True
++    assert data["repeated_failures"][0]["count"] == 2
++    assert data["repeated_failures"][0]["tool_name"] == "Bash"
++    lesson = data["lessons"][0]
++    assert lesson["status"] == "approved" and lesson["confidence"] == 0.8
++    assert len(lesson["rule_text"]) > 150  # text mode truncates; json must not
++
++
++def test_review_text_output_unchanged(tmp_path: Path, capsys) -> None:
++    db = tmp_path / "learning.db"
++    workspace = str(tmp_path)
++    _seed(db, workspace)
++
++    assert learning.command_review(_args(db, workspace, "text")) == 0
++    out = capsys.readouterr().out
++    assert out.startswith("Continuous learning review for ")
++    assert "Repeated failures:" in out and "Stored lessons:" in out
+-- 
+2.43.0
+

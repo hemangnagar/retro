@@ -38,11 +38,26 @@ def _run(cmd: list[str], cwd: str | None = None) -> tuple[int, str]:
 
 
 def lb_review(workspace: str, include_candidates: bool = True) -> dict:
-    """Parse `learned-behavior review` for a workspace into structured rows."""
-    cmd = ["learned-behavior", "review", "--workspace", workspace]
+    """`learned-behavior review` for a workspace as structured rows.
+
+    Prefers `--output json` (learned-behavior > 0.2.0, see docs/upstream/);
+    older versions reject the flag, so fall back to parsing the two text line
+    shapes the human output prints."""
+    base = ["learned-behavior", "review", "--workspace", workspace]
     if include_candidates:
-        cmd.append("--all")
-    code, out = _run(cmd)
+        base.append("--all")
+
+    code, out = _run(base + ["--output", "json"])
+    if code == 0:
+        try:
+            data = json.loads(out)
+            return {"available": True, "source": "json",
+                    "repeated_failures": data.get("repeated_failures", []),
+                    "lessons": data.get("lessons", []), "unparsed": []}
+        except ValueError:
+            pass  # not JSON after all — fall through to the text parser
+
+    code, out = _run(base)
     if code != 0:
         return {"available": False, "error": out.strip()[:300],
                 "repeated_failures": [], "lessons": [], "unparsed": []}
@@ -70,7 +85,7 @@ def lb_review(workspace: str, include_candidates: bool = True) -> dict:
                 lessons.append(row)
                 continue
             unparsed.append(stripped)
-    return {"available": True, "repeated_failures": failures,
+    return {"available": True, "source": "text", "repeated_failures": failures,
             "lessons": lessons, "unparsed": unparsed}
 
 
