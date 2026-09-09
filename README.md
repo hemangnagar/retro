@@ -68,6 +68,13 @@ and it deliberately breaks the recursion in three places:
 
 So: feedback with a damper, not a function calling itself.
 
+The same two gates show up in the research on self-evolving agents. Google's
+*Procedural Graphs* ([arXiv 2609.09153](https://arxiv.org/abs/2609.09153))
+lets an agent's execution graph rewrite itself, but commits an edit only if
+it survives held-out validation, and keeps rejected edits on file so the same
+change is never proposed twice. retro's budget gate and its `discard` record
+in `retro.json` are the human-scale versions of those two rules.
+
 ## vs. continuous memory systems (Engram, mem0, …)
 
 Tools like Weaviate's Engram attack the same problem — agents learning from
